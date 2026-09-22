@@ -1,7 +1,9 @@
 package com.eidiko.spring_mail.controller;
 
+import com.eidiko.spring_mail.dto.EmailReportRequest;
 import com.eidiko.spring_mail.dto.EmailRequest;
 import com.eidiko.spring_mail.service.EmailService;
+import com.eidiko.spring_mail.service.PdfService;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -13,6 +15,9 @@ public class EmailController {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private PdfService pdfService;
 
     @PostMapping(value = "/send",
     consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -31,6 +36,20 @@ public class EmailController {
                         request.getFiles()
                 );
         return "Mail sent Successfully";
+    }
+
+    @PostMapping("/send-report")
+    public String generateSendReport(@RequestBody EmailReportRequest request)
+            throws MessagingException {
+
+        String[] array = request.getToEmail().split("@");
+        byte[] pdfBytes = pdfService.generatePdf(array[0],request.getToEmail());
+
+        emailService.sendMailWithPdf(request.getToEmail(),
+                request.getSubject(),
+                request.getBody(),
+                pdfBytes);
+        return "report sent successfully";
     }
 }
 
