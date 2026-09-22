@@ -1,14 +1,11 @@
 package com.eidiko.spring_mail.controller;
 
-import com.eidiko.spring_mail.dto.EmailDTO;
+import com.eidiko.spring_mail.dto.EmailRequest;
 import com.eidiko.spring_mail.service.EmailService;
-import com.sun.source.tree.BreakTree;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/email")
@@ -17,8 +14,9 @@ public class EmailController {
     @Autowired
     private EmailService emailService;
 
-    @PostMapping("/send")
-    public String sendEmail(@RequestBody EmailDTO request) throws MessagingException {
+    @PostMapping(value = "/send",
+    consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public String sendEmail(@ModelAttribute EmailRequest request) throws MessagingException {
         String body = """
         Hello User
         Welcome to our application.
@@ -26,11 +24,11 @@ public class EmailController {
         Regards,
         HR Team
         """;
-        emailService.
-                sendEmail(
+        emailService.sendEmailWithAttachments(
                         request.getToEmail(),
                         request.getSubject(),
-                        body
+                        body,
+                        request.getFiles()
                 );
         return "Mail sent Successfully";
     }

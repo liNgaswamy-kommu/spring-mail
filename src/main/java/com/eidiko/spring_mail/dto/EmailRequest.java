@@ -1,10 +1,12 @@
 package com.eidiko.spring_mail.dto;
 
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
-public class EmailDTO {
+public class EmailRequest {
     private String toEmail;
     private String subject;
     private String body;
+    private MultipartFile[] files;
 }
